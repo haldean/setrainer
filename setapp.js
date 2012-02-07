@@ -27,6 +27,7 @@ var deselectAll = function() {
   }
 }
 
+// takes a list of three ids and returns true if they form a set
 var cardsMatch = function(deck) {
   var checkMatch = function(index) {
     var match = (
@@ -42,6 +43,8 @@ var cardsMatch = function(deck) {
   return checkMatch(0) && checkMatch(1) && checkMatch(2) && checkMatch(3);
 }
 
+// brute force check to see if a set exists in the cards in play. returns
+// a list of three ids or false.
 var setExists = function() {
   for (var i = 0; i < in_play.length; i++) {
     for (var j = 0; j < in_play.length; j++) {
@@ -65,6 +68,7 @@ var checkForSet = function() {
 
   groups++;
 
+  // remove cards from play that were used in the set
   while (selected.length) {
     var id = selected.shift();
     bonzo(document.getElementById(id)).remove();
@@ -109,11 +113,6 @@ var selectCard = function(ev, id) {
     return true;
   }
 
-  for (var i = 0; i < selected.length; i++) {
-    if (selected[i] == id) {
-      
-    }
-  }
   if (selected.length >= 3) {
     var oldId = selected.shift();
     bonzo(document.getElementById(oldId)).removeClass('selected');
@@ -125,6 +124,7 @@ var selectCard = function(ev, id) {
   if (selected.length == 3) checkForSet();
 }
 
+// create the card graphic
 var cardDiv = function(card) {
   var div = document.createElement('div');
 
@@ -155,6 +155,7 @@ var genCards = function() {
             'number': number,
             'selected': false,
           };
+          
           deck[i]['id'] = cardId(deck[i]);
 
           i++;
@@ -163,6 +164,7 @@ var genCards = function() {
     }
   }
 
+  // shuffle the deck.
   var i, j, t;
   for (i = 1; i < deck.length; i++) {
     j = Math.floor(Math.random()*(1+i));
@@ -182,6 +184,11 @@ var deal = function() {
     }
   }
 
+  // this is here to make sure a set is possible. if a set is not possible, it
+  // deals an extra three cards and we hope that solves the problem. it's
+  // done asyncronously, because the brute-force find was a bit much for my
+  // poor phone, and it slowed down interaction a lot. usually, this will return
+  // almost instantly.
   setTimeout(function() {
     var goodDeal = setExists();
     if (!goodDeal) {
@@ -197,15 +204,8 @@ var deal = function() {
 
 var cheat = function() {
   var set = setExists();
-  console.log(set);
   for (var i = 0; i < set.length; i++) {
     $('#' + set[i]).addClass('cheat');
-  }
-}
-
-var printInPlay = function() {
-  for (var i = 0; i < in_play.length; i++) {
-    console.log(printCard(in_play[i]));
   }
 }
 
