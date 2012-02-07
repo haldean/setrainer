@@ -1,52 +1,29 @@
 var bean = require('bean');
 var bonzo = require('bonzo');
 
-deck = new Array(81);
-in_play = new Array(12);
-selected = new Array();
+var deck = new Array(81);
+var in_play = new Array(12);
+var selected = new Array();
+var groups = 0;
 
-var fillName = function(fill) {
-  switch (fill) {
-    case 0: return 'solid';
-    case 1: return 'shaded';
-    case 2: return 'hollow';
-    default: return '(fill ' + fill + ')';
-  }
-};
-
-var colorName = function(color) {
-  switch (color) {
-    case 0: return 'blue';
-    case 1: return 'green';
-    case 2: return 'red';
-    default: return '(color ' + color + ')';
-  }
-};
-
-var shapeName = function(shape) {
-  switch (shape) {
-    case 0: return 'ellipse';
-    case 1: return 'squiggle';
-    case 2: return 'diamond';
-    default: return '(shape ' + shape + ')';
-  }
-};
+var updateStats = function() {
+  $('#sets').text('Groups: ' + groups);
+  $('#left').text('Deck: ' + deck.length);
+  $('#time').text('');
+}
 
 var cardId = function(card) {
   return '' + card.number + card.fill + card.color + card.shape;
 }
 
-var printCard = function(card) {
-  return (card.number + 1) + ' x ' +
-    fillName(card.fill) + ' ' +
-    colorName(card.color) + ' ' +
-    shapeName(card.shape);
-};
-
 var deselectAll = function() {
   while (selected.length) {
     var id = selected.shift();
     bonzo(document.getElementById(id)).removeClass('selected');
+    bonzo(document.getElementById(id)).addClass('incorrect');
+    setTimeout(function(removeid) {
+      bonzo(document.getElementById(removeid)).removeClass('incorrect');
+    }, 500, id);
   }
 }
 
@@ -66,19 +43,13 @@ var cardsMatch = function(deck) {
 }
 
 var setExists = function() {
-  console.log(in_play.length);
-  console.log(in_play);
   for (var i = 0; i < in_play.length; i++) {
     for (var j = 0; j < in_play.length; j++) {
       if (i == j) continue;
       for (var k = 0; k < in_play.length; k++) {
         if (i == k || j == k) continue;
         if (cardsMatch([in_play[i].id, in_play[j].id, in_play[k].id])) {
-          //return [in_play[i].id, in_play[j].id, in_play[k].id];
-          return [
-            printCard(in_play[i]), 
-            printCard(in_play[j]),
-            printCard(in_play[k])];
+          return [in_play[i].id, in_play[j].id, in_play[k].id];
         }
       }
     }
@@ -92,21 +63,42 @@ var checkForSet = function() {
     return;
   }
 
+  groups++;
+
   while (selected.length) {
     var id = selected.shift();
     bonzo(document.getElementById(id)).remove();
     for (var i = 0; i < in_play.length; i++) {
-      if (in_play[i].id === id) {
-        in_play.splice(i, 1);
+      if (in_play[i] && in_play[i].id === id) {
+        in_play[i] = undefined;
         break;
       }
     }
   }
 
-  deal();
+  if (in_play.length == 15) {
+    // Compact to the standard 12 squares
+    var overIndex = 0;
+    var overflows = in_play.splice(12, 3);
+    for (var i = 0; i < in_play.length; i++) {
+      if (!in_play[i]) {
+        while (!in_play[i]) {
+          overIndex++;
+          in_play[i] = overflows.shift();
+        }
+
+        bonzo(document.getElementById(in_play[i].id)).remove();
+        bonzo(document.getElementById('card' + i)).append(cardDiv(in_play[i]));
+      }
+    }
+  } else {
+    deal();
+  }
 }
 
 var selectCard = function(ev, id) {
+  bonzo(document.getElementById(id)).removeClass('cheat');
+
   if (selected.indexOf(id) != -1) {
     for (var i = selected.indexOf(id); i < selected.length - 1; i++) {
       selected[i] = selected[i+1];
@@ -163,9 +155,7 @@ var genCards = function() {
             'number': number,
             'selected': false,
           };
-
           deck[i]['id'] = cardId(deck[i]);
-          deck[i]['name'] = printCard(deck[i]);
 
           i++;
         }
@@ -188,12 +178,30 @@ var deal = function() {
   for (var i = 0; i < 12; i++) {
     if (!in_play[i] && deck.length) {
       in_play[i] = deck.pop();
-      $('#mat').append(cardDiv(in_play[i]));
+      $(document.getElementById('card' + i)).append(cardDiv(in_play[i]));
     }
   }
 
-  console.log(setExists());
+  setTimeout(function() {
+    var goodDeal = setExists();
+    if (!goodDeal) {
+      for (var i = 12; i < 15; i++) {
+        in_play[i] = deck.pop();
+        $(document.getElementById('over' + (i - 12))).append(cardDiv(in_play[i]));
+      }
+    }
+
+    updateStats();
+  }, 0);
 };
+
+var cheat = function() {
+  var set = setExists();
+  console.log(set);
+  for (var i = 0; i < set.length; i++) {
+    $('#' + set[i]).addClass('cheat');
+  }
+}
 
 var printInPlay = function() {
   for (var i = 0; i < in_play.length; i++) {
@@ -202,6 +210,7 @@ var printInPlay = function() {
 }
 
 $.domReady(function() {
+  $('#hint').click(cheat);
   genCards();
   deal();
 });

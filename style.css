@@ -1,29 +1,80 @@
+body {
+  background: #444;
+  color: #FFF;
+  margin: 40px;
+  font-family: 'Lilita One', sans-serif;
+}
+
+table {
+  float: left;
+}
+
+h1 {
+  color: #EDE44C;
+}
+
+a {
+  color: #EDE44C;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #FFFF00;
+}
+
+#info {
+  font-size: 24pt;
+  text-transform: uppercase;
+  width: 200pt;
+}
+
 .card {
-  width: 90px;
   height: 140px;
+  width: 100px;
   border: 3px solid #AAA;
   text-align: center;
-  padding: 20px 5px;
   float: left;
-  margin: 10px;
+  background: #FFF;
   display: table;
 }
 
 .card div {
-  display: table-cell;
   vertical-align: middle;
+  display: table-cell;
 }
 
 .card canvas {
-  width: 100%;
-  height: 30%;
+  width: 100px;
+  height: 37px;
   display: inline;
 }
 
 #mat {
-  width: 700px;
+  padding: 20px;
+  background: url("images/mat.png") repeat;
+  border: 4px solid #EDE44C;
+  float: left;
+  text-align: center;
+  height: 80%;
+}
+
+#mat tr {
+  height: 20%;
+}
+
+#mat td {
+  width: 20%;
+  padding: 10pt;
 }
 
 .selected {
-  border: 3px solid #FFCC00;
+  border: 3px solid #FC0;
+}
+
+.incorrect {
+  border: 3px solid #F00;
+}
+
+.cheat {
+  border: 3px solid #00F;
 }
