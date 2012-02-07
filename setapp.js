@@ -95,9 +95,9 @@ var checkForSet = function() {
         bonzo(document.getElementById('card' + i)).append(cardDiv(in_play[i]));
       }
     }
-  } else {
-    deal();
   }
+
+  deal();
 }
 
 var selectCard = function(ev, id) {
