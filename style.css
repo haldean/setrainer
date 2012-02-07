@@ -28,6 +28,17 @@ a:hover {
   width: 200pt;
 }
 
+#options {
+  font-size: 14pt;
+}
+
+#options input {
+  height: 16pt;
+  width: 16pt;
+  position: relative;
+  top: 2px;
+}
+
 .card {
   height: 140px;
   width: 100px;
@@ -69,6 +80,7 @@ a:hover {
 
 .selected {
   border: 3px solid #FC0;
+  background: #FFB;
 }
 
 .incorrect {
