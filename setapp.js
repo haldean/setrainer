@@ -199,11 +199,21 @@ var deal = function() {
     }
 
     updateStats();
+    if ($('#autocheat').attr('checked')) {
+      if (goodDeal) {
+        cheat(goodDeal);
+      } else {
+        cheat();
+      }
+    }
   }, 0);
 };
 
-var cheat = function() {
-  var set = setExists();
+var cheat = function(set) {
+  if (!set) {
+    var set = setExists();
+  }
+
   for (var i = 0; i < set.length; i++) {
     $('#' + set[i]).addClass('cheat');
   }
@@ -211,6 +221,11 @@ var cheat = function() {
 
 $.domReady(function() {
   $('#hint').click(cheat);
+  $('#autocheat').click(function() {
+    if ($('#autocheat').attr('checked')) {
+      cheat();
+    }
+  });
   genCards();
   deal();
 });
