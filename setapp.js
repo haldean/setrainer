@@ -220,12 +220,13 @@ var cheat = function(set) {
 }
 
 $.domReady(function() {
-  $('#hint').click(cheat);
+  $('#hint').click(function() { cheat(); });
   $('#autocheat').click(function() {
     if ($('#autocheat').attr('checked')) {
       cheat();
     }
   });
+
   genCards();
   deal();
 });
