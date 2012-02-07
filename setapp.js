@@ -201,7 +201,7 @@ var printInPlay = function() {
   }
 }
 
-$(document).ready(function() {
+$.domReady(function() {
   genCards();
   deal();
 });
