@@ -1,5 +1,5 @@
 .card {
-  width: 80px;
+  width: 90px;
   height: 140px;
   border: 3px solid #AAA;
   text-align: center;
@@ -21,7 +21,7 @@
 }
 
 #mat {
-  width: 600px;
+  width: 700px;
 }
 
 .selected {
