@@ -23,8 +23,6 @@ function roundRect(ctx, x, y, width, height, radius) {
   ctx.lineTo(x, y + radius);
   ctx.quadraticCurveTo(x, y, x + radius, y);
   ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
 }
 
 var ellipse = function(ctx) {
@@ -39,8 +37,6 @@ var squiggle = function(ctx) {
   ctx.bezierCurveTo(100, 75, 100, 37, 50, 63);
   ctx.bezierCurveTo(25, 68, 0, 37, 50, 12);
   ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
 };
 
 var diamond = function(ctx) {
@@ -50,8 +46,6 @@ var diamond = function(ctx) {
   ctx.lineTo(175, 37);
   ctx.lineTo(100, 63);
   ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
 };
 
 var drawCard = function(card) {
@@ -68,25 +62,34 @@ var drawCard = function(card) {
     case 2: color = "rgb(240,77,35)"; break;
   }
 
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 5;
-  if (card.fill == 0) {
-    ctx.fillStyle = color;
-  } else if (card.fill == 1) {
-    switch (card.color) {
-      case 0: ctx.fillStyle = "rgb(141,154,207)"; break;
-      case 1: ctx.fillStyle = "rgb(158,229,149)"; break;
-      case 2: ctx.fillStyle = "rgb(240,161,141)"; break;
-    }
-  } else {
-    ctx.fillStyle = "rgb(255, 255, 255)";
-  }
-
   switch (card.shape) {
     case 0: ellipse(ctx); break;
     case 1: squiggle(ctx); break;
     case 2: diamond(ctx); break;
   }
+
+  if (card.fill == 0) {
+    ctx.fillStyle = color;
+    ctx.fill()
+  } else if (card.fill == 1) {
+    var stripeImage = new Image();
+    stripeImage.src = 'images/' + (
+      card.color == 0 ? 'blue-stripe.png' :
+      card.color == 1 ? 'green-stripe.png' :
+      card.color == 2 ? 'red-stripe.png' : undefined);
+    stripeImage.onload = function(ev) {
+      var pattern = ctx.createPattern(stripeImage, 'repeat');
+      ctx.fillStyle = pattern;
+      ctx.fill();
+      // have to include stroke here, because it's important that
+      // stroke be drawn after fill.
+      ctx.stroke();
+    }
+  }
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 5;
+  ctx.stroke();
   
   return canvas;
 }
