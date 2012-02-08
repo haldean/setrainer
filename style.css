@@ -39,6 +39,7 @@ a:hover {
 }
 
 #info {
+  color: #AAA;
   font-size: 24pt;
   text-transform: uppercase;
   width: 200pt;
