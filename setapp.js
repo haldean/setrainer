@@ -47,10 +47,11 @@ var cardsMatch = function(deck) {
 // a list of three ids or false.
 var setExists = function() {
   for (var i = 0; i < in_play.length; i++) {
+    if (!in_play[i]) continue;
     for (var j = 0; j < in_play.length; j++) {
-      if (i == j) continue;
+      if (!in_play[j] || i == j) continue;
       for (var k = 0; k < in_play.length; k++) {
-        if (i == k || j == k) continue;
+        if (!in_play[k] || i == k || j == k) continue;
         if (cardsMatch([in_play[i].id, in_play[j].id, in_play[k].id])) {
           return [in_play[i].id, in_play[j].id, in_play[k].id];
         }
@@ -126,6 +127,8 @@ var selectCard = function(ev, id) {
 
 // create the card graphic
 var cardDiv = function(card) {
+  if (!card) return;
+
   var div = document.createElement('div');
 
   $(div).addClass('card');
@@ -181,6 +184,9 @@ var deal = function() {
     if (!in_play[i] && deck.length) {
       in_play[i] = deck.pop();
       $(document.getElementById('card' + i)).append(cardDiv(in_play[i]));
+    } else if (!in_play[i]) {
+      $(document.getElementById('card' + i)).append(
+          '<div class="card"></div>');
     }
   }
 
@@ -194,18 +200,22 @@ var deal = function() {
     if (!goodDeal) {
       for (var i = 12; i < 15; i++) {
         in_play[i] = deck.pop();
-        $(document.getElementById('over' + (i - 12))).append(cardDiv(in_play[i]));
+        if (in_play[i]) {
+          $(document.getElementById('over' + (i - 12))).append(cardDiv(in_play[i]));
+        }
       }
     }
 
+    if (!goodDeal) {
+      goodDeal = setExists();
+    }
+
+    victory(goodDeal);
     updateStats();
     if ($('#autocheat').attr('checked')) {
-      if (goodDeal) {
-        cheat(goodDeal);
-      } else {
-        cheat();
-      }
+      cheat(goodDeal);
     }
+
   }, 0);
 };
 
@@ -219,11 +229,45 @@ var cheat = function(set) {
   }
 }
 
+var autoplay = function() {
+  if (!$('#autoplay').attr('checked')) return;
+
+  var set = setExists();
+  if (!set) {
+    victory();
+    return;
+  }
+
+  deselectAll();
+
+  selected = set;
+  $('#' + set[0]).addClass('selected');
+  $('#' + set[1]).addClass('selected');
+  $('#' + set[2]).addClass('selected');
+
+  setTimeout(checkForSet, 300);
+  setTimeout(autoplay, 500);
+}
+
+var victory = function(set) {
+  console.log("victory?");
+  if (deck.length != 0) return;
+  if (set || setExists()) return;
+  console.log("yes!");
+  $('.card').css('visibility', 'hidden');
+  $('#victory').css('display', 'block');
+}
+
 $.domReady(function() {
   $('#hint').click(function() { cheat(); });
   $('#autocheat').click(function() {
     if ($('#autocheat').attr('checked')) {
       cheat();
+    }
+  });
+  $('#autoplay').click(function() {
+    if ($('#autoplay').attr('checked')) {
+      autoplay();
     }
   });
 
